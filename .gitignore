@@ -1,7 +1,5 @@
 node_modules/
 logs/
-config/.env.development
-config/.env.production
 *.log
 
 # IDE
