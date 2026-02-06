@@ -9,7 +9,7 @@ module.exports = {
             kill_timeout: 5000,
             env: {
                 APPLICATION_STATUS : 'development',
-                PORT : 8080,
+                PORT : 80,
                 DATABASE_HOST : "211.192.7.222",
                 DATABASE_USER : "kyronko",
                 DATABASE_PASSWORD : "rnswidla1!",
@@ -27,7 +27,7 @@ module.exports = {
             kill_timeout: 5000,
             env: {
                 APPLICATION_STATUS : 'production',
-                PORT : 8080,
+                PORT : 80,
                 DATABASE_HOST : "localhost",
                 DATABASE_USER : "postgres",
                 DATABASE_PASSWORD : "password",
