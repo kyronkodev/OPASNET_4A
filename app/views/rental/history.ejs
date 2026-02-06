@@ -1,0 +1,134 @@
+<div class="page-header">
+    <h4><i class="bi bi-journal-text"></i> 대여기록
+        <small>장비 대여/반납/예약 기록을 조회할 수 있습니다.</small>
+    </h4>
+</div>
+
+<!-- 검색/필터 -->
+<div class="search-box">
+    <form method="GET" action="/rental/history">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label fw-bold">구분</label>
+                <select name="action" class="form-select form-select-sm">
+                    <option value="">전체</option>
+                    <option value="rent" <%= filters.action === 'rent' ? 'selected' : '' %>>대여</option>
+                    <option value="return" <%= filters.action === 'return' ? 'selected' : '' %>>반납</option>
+                    <option value="reserve" <%= filters.action === 'reserve' ? 'selected' : '' %>>예약</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-bold">검색어</label>
+                <input type="text" name="keyword" class="form-control form-control-sm"
+                       placeholder="대여자, 부서, 모델명, 자산번호" value="<%= filters.keyword || '' %>">
+            </div>
+            <div class="col-md-3 d-flex gap-1">
+                <button type="submit" class="btn btn-accent btn-sm">
+                    <i class="bi bi-search"></i> 검색
+                </button>
+                <a href="/rental/history" class="btn btn-subtle btn-sm">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- 결과 테이블 -->
+<div class="result-box">
+    <div class="result-header">
+        <span class="result-title">조회결과 ( <%= pagination.totalCount %> 건 )</span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover table-sm table-bordered mb-0">
+            <thead class="thead-muted">
+                <tr>
+                    <th class="text-center" style="width:50px">No.</th>
+                    <th class="text-center">일시</th>
+                    <th>자산번호</th>
+                    <th>모델명</th>
+                    <th>Vendor</th>
+                    <th class="text-center">구분</th>
+                    <th>대여자</th>
+                    <th>부서</th>
+                    <th>대여일</th>
+                    <th>반납예정일</th>
+                    <th>실제반납일</th>
+                    <th>사용장소</th>
+                    <th>사용목적</th>
+                    <th>처리자</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (rentals.length === 0) { %>
+                    <tr><td colspan="14" class="text-center py-4 text-muted">조회결과가 없습니다.</td></tr>
+                <% } else { %>
+                    <% rentals.forEach((r, index) => { %>
+                        <tr>
+                            <td class="text-center"><%= pagination.offset + index + 1 %></td>
+                            <td class="text-center"><%= helpers.formatDateTime(r.created_at) %></td>
+                            <td>
+                                <a href="/equipment/<%= r.equipment_id %>"><%= r.asset_number || '-' %></a>
+                            </td>
+                            <td><%= r.model_name || '-' %></td>
+                            <td><%= r.vendor || '-' %></td>
+                            <td class="text-center">
+                                <span class="badge <%= helpers.getActionBadgeClass(r.action) %>">
+                                    <%= helpers.getActionLabel(r.action) %>
+                                </span>
+                            </td>
+                            <td><%= r.borrower_name || '-' %></td>
+                            <td><%= r.borrower_dept || '-' %></td>
+                            <td><%= helpers.formatDateTime(r.rent_date) %></td>
+                            <td><%= helpers.formatDateTime(r.return_date) %></td>
+                            <td><%= helpers.formatDateTime(r.actual_return_date) %></td>
+                            <td><%= r.use_location || '-' %></td>
+                            <td><%= r.purpose || '-' %></td>
+                            <td><%= r.processor_name || '-' %></td>
+                        </tr>
+                    <% }); %>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+
+    <% if (pagination.totalPages > 1) { %>
+        <nav class="mt-3 mb-3 d-flex justify-content-center">
+            <ul class="pagination pagination-sm">
+                <% if (pagination.hasPrev) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<%= pagination.startPage - 1 %>&<%= Object.entries(filters).filter(([k,v]) => v).map(([k,v]) => k+'='+v).join('&') %>">
+                            <i class="bi bi-chevron-double-left"></i>
+                        </a>
+                    </li>
+                <% } %>
+                <% if (pagination.currentPage > 1) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<%= pagination.currentPage - 1 %>&<%= Object.entries(filters).filter(([k,v]) => v).map(([k,v]) => k+'='+v).join('&') %>">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                <% } %>
+                <% for (let i = pagination.startPage; i <= pagination.endPage; i++) { %>
+                    <li class="page-item <%= i === pagination.currentPage ? 'active' : '' %>">
+                        <a class="page-link" href="?page=<%= i %>&<%= Object.entries(filters).filter(([k,v]) => v).map(([k,v]) => k+'='+v).join('&') %>"><%= i %></a>
+                    </li>
+                <% } %>
+                <% if (pagination.currentPage < pagination.totalPages) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<%= pagination.currentPage + 1 %>&<%= Object.entries(filters).filter(([k,v]) => v).map(([k,v]) => k+'='+v).join('&') %>">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                <% } %>
+                <% if (pagination.hasNext) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<%= pagination.endPage + 1 %>&<%= Object.entries(filters).filter(([k,v]) => v).map(([k,v]) => k+'='+v).join('&') %>">
+                            <i class="bi bi-chevron-double-right"></i>
+                        </a>
+                    </li>
+                <% } %>
+            </ul>
+        </nav>
+    <% } %>
+</div>

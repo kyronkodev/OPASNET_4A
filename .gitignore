@@ -1,0 +1,13 @@
+node_modules/
+logs/
+config/.env.development
+config/.env.production
+*.log
+
+# IDE
+.idea/
+*.iml
+
+# Windows
+nul
+Thumbs.db

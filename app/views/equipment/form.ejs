@@ -1,0 +1,90 @@
+<div class="page-header">
+    <h4>
+        <i class="bi bi-hdd-rack"></i>
+        <%= mode === 'create' ? '장비 등록' : '장비 수정' %>
+    </h4>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <% if (typeof error !== 'undefined' && error) { %>
+            <div class="alert alert-danger" style="font-size:12px;">
+                <%= error %>
+            </div>
+        <% } %>
+        <form method="POST" action="<%= mode === 'create' ? '/equipment/create' : '/equipment/' + equipment.id + '/edit' %>">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="category" class="form-label fw-bold">구분 <span style="color:var(--color-rented)">*</span></label>
+                    <select name="category" id="category" class="form-select" required>
+                        <option value="">선택</option>
+                        <option value="Switch" <%= equipment && equipment.category === 'Switch' ? 'selected' : '' %>>Switch</option>
+                        <option value="Router" <%= equipment && equipment.category === 'Router' ? 'selected' : '' %>>Router</option>
+                        <option value="Server" <%= equipment && equipment.category === 'Server' ? 'selected' : '' %>>Server</option>
+                        <option value="Firewall" <%= equipment && equipment.category === 'Firewall' ? 'selected' : '' %>>Firewall</option>
+                        <option value="AP" <%= equipment && equipment.category === 'AP' ? 'selected' : '' %>>AP</option>
+                        <option value="기타" <%= equipment && equipment.category === '기타' ? 'selected' : '' %>>기타</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="vendor" class="form-label fw-bold">Vendor <span style="color:var(--color-rented)">*</span></label>
+                    <input type="text" name="vendor" id="vendor" class="form-control"
+                           value="<%= equipment ? equipment.vendor : '' %>" placeholder="예: Cisco, HP, Palo Alto" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="model_name" class="form-label fw-bold">모델명 <span style="color:var(--color-rented)">*</span></label>
+                    <input type="text" name="model_name" id="model_name" class="form-control"
+                           value="<%= equipment ? equipment.model_name : '' %>" placeholder="예: WS-C2960-24TT-L" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="uplink" class="form-label fw-bold">업링크</label>
+                    <input type="text" name="uplink" id="uplink" class="form-control"
+                           value="<%= equipment ? equipment.uplink : '' %>" placeholder="예: 1G 2p, 10G 4p">
+                </div>
+                <div class="col-md-4">
+                    <label for="power_redundancy" class="form-label fw-bold">파워이중화</label>
+                    <select name="power_redundancy" id="power_redundancy" class="form-select">
+                        <option value="x" <%= equipment && equipment.power_redundancy === 'x' ? 'selected' : '' %>>x (없음)</option>
+                        <option value="o" <%= equipment && equipment.power_redundancy === 'o' ? 'selected' : '' %>>o (있음)</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="asset_number" class="form-label fw-bold">자산번호 <span style="color:var(--color-rented)">*</span></label>
+                    <input type="text" name="asset_number" id="asset_number" class="form-control"
+                           value="<%= equipment ? equipment.asset_number : '' %>" placeholder="예: SW001" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="serial_number" class="form-label fw-bold">S/N</label>
+                    <input type="text" name="serial_number" id="serial_number" class="form-control"
+                           value="<%= equipment ? equipment.serial_number : '' %>" placeholder="시리얼 번호">
+                </div>
+                <div class="col-md-4">
+                    <label for="location" class="form-label fw-bold">위치</label>
+                    <input type="text" name="location" id="location" class="form-control"
+                           value="<%= equipment ? equipment.location : '' %>" placeholder="예: 가산, 가산(Lab실)">
+                </div>
+                <div class="col-md-4">
+                    <label for="status" class="form-label fw-bold">상태</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="available" <%= equipment && equipment.status === 'available' ? 'selected' : '' %>>사용가능</option>
+                        <option value="rented" <%= equipment && equipment.status === 'rented' ? 'selected' : '' %>>대여중</option>
+                        <option value="reserved" <%= equipment && equipment.status === 'reserved' ? 'selected' : '' %>>예약중</option>
+                    </select>
+                </div>
+                <div class="col-md-12">
+                    <label for="description" class="form-label fw-bold">비고</label>
+                    <textarea name="description" id="description" class="form-control" rows="3"
+                              placeholder="비고사항을 입력하세요"><%= equipment ? equipment.description : '' %></textarea>
+                </div>
+            </div>
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-accent btn-sm">
+                    <i class="bi bi-check-lg"></i> <%= mode === 'create' ? '등록' : '수정' %>
+                </button>
+                <a href="<%= mode === 'edit' && equipment ? '/equipment/' + equipment.id : '/equipment' %>" class="btn btn-subtle btn-sm">
+                    <i class="bi bi-x-lg"></i> 취소
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

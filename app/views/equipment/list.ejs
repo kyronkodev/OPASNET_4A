@@ -1,0 +1,203 @@
+<div class="page-header">
+    <h4><i class="bi bi-hdd-rack"></i> 장비현황
+        <small>등록된 장비들을 조회할 수 있습니다.</small>
+    </h4>
+</div>
+
+<!-- 통계 카드 -->
+<div class="row mb-3 g-3">
+    <div class="col-md-3">
+        <div class="stat-card stat-total">
+            <div class="stat-icon"><i class="bi bi-box-seam"></i></div>
+            <div class="stat-info">
+                <div class="stat-number"><%= stats.total %></div>
+                <div class="stat-label">전체 장비</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-ok">
+            <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
+            <div class="stat-info">
+                <div class="stat-number"><%= stats.available %></div>
+                <div class="stat-label">사용가능</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-rented">
+            <div class="stat-icon"><i class="bi bi-arrow-left-right"></i></div>
+            <div class="stat-info">
+                <div class="stat-number"><%= stats.rented %></div>
+                <div class="stat-label">대여중</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-reserve">
+            <div class="stat-icon"><i class="bi bi-clock"></i></div>
+            <div class="stat-info">
+                <div class="stat-number"><%= stats.reserved %></div>
+                <div class="stat-label">예약중</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 검색/필터 -->
+<div class="search-box">
+    <form method="GET" action="/equipment" id="searchForm">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label fw-bold">구분</label>
+                <select name="category" class="form-select form-select-sm">
+                    <option value="">전체</option>
+                    <% filterOptions.categories.forEach(c => { %>
+                        <option value="<%= c %>" <%= filters.category === c ? 'selected' : '' %>><%= c %></option>
+                    <% }); %>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold">Vendor</label>
+                <select name="vendor" class="form-select form-select-sm">
+                    <option value="">전체</option>
+                    <% filterOptions.vendors.forEach(v => { %>
+                        <option value="<%= v %>" <%= filters.vendor === v ? 'selected' : '' %>><%= v %></option>
+                    <% }); %>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold">위치</label>
+                <select name="location" class="form-select form-select-sm">
+                    <option value="">전체</option>
+                    <% filterOptions.locations.forEach(l => { %>
+                        <option value="<%= l %>" <%= filters.location === l ? 'selected' : '' %>><%= l %></option>
+                    <% }); %>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold">상태</label>
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">전체</option>
+                    <option value="available" <%= filters.status === 'available' ? 'selected' : '' %>>사용가능</option>
+                    <option value="rented" <%= filters.status === 'rented' ? 'selected' : '' %>>대여중</option>
+                    <option value="reserved" <%= filters.status === 'reserved' ? 'selected' : '' %>>예약중</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label fw-bold">검색어</label>
+                <input type="text" name="keyword" class="form-control form-control-sm"
+                       placeholder="모델명, 자산번호 등" value="<%= filters.keyword || '' %>">
+            </div>
+            <div class="col-md-2 d-flex gap-1">
+                <button type="submit" class="btn btn-accent btn-sm">
+                    <i class="bi bi-search"></i> 검색
+                </button>
+                <a href="/equipment" class="btn btn-subtle btn-sm">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- 결과 테이블 -->
+<div class="result-box">
+    <div class="result-header">
+        <span class="result-title">조회결과 ( <%= pagination.totalCount %> 건 )</span>
+        <div class="result-actions">
+            <% if (user.role === 'admin') { %>
+                <a href="/equipment/create" class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#e2e8f0;border:none;">
+                    <i class="bi bi-plus-lg"></i> 장비 추가
+                </a>
+            <% } %>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover table-sm table-bordered mb-0">
+            <thead class="thead-muted">
+                <tr>
+                    <th class="text-center" style="width:50px">No.</th>
+                    <th>구분</th>
+                    <th>Vendor</th>
+                    <th>모델명</th>
+                    <th>업링크</th>
+                    <th class="text-center">파워이중화</th>
+                    <th>자산번호</th>
+                    <th>S/N</th>
+                    <th>위치</th>
+                    <th class="text-center">상태</th>
+                    <th>비고</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (equipments.length === 0) { %>
+                    <tr>
+                        <td colspan="11" class="text-center py-4 text-muted">조회결과가 없습니다.</td>
+                    </tr>
+                <% } else { %>
+                    <% equipments.forEach((eq, index) => { %>
+                        <tr class="cursor-pointer" onclick="location.href='/equipment/<%= eq.id %>'">
+                            <td class="text-center"><%= pagination.offset + index + 1 %></td>
+                            <td><%= eq.category || '-' %></td>
+                            <td><%= eq.vendor || '-' %></td>
+                            <td class="model-name-link"><%= eq.model_name || '-' %></td>
+                            <td><%= eq.uplink || '-' %></td>
+                            <td class="text-center"><%= eq.power_redundancy || '-' %></td>
+                            <td><%= eq.asset_number || '-' %></td>
+                            <td><%= eq.serial_number || '-' %></td>
+                            <td><%= eq.location || '-' %></td>
+                            <td class="text-center">
+                                <span class="badge <%= helpers.getStatusBadgeClass(eq.status) %>">
+                                    <%= helpers.getStatusLabel(eq.status) %>
+                                </span>
+                            </td>
+                            <td class="text-truncate" style="max-width:150px"><%= eq.description || '-' %></td>
+                        </tr>
+                    <% }); %>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 페이지네이션 -->
+    <% if (pagination.totalPages > 1) { %>
+        <nav class="mt-3 mb-3 d-flex justify-content-center">
+            <ul class="pagination pagination-sm">
+                <% if (pagination.hasPrev) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<%= pagination.startPage - 1 %>&<%= Object.entries(filters).filter(([k,v]) => v).map(([k,v]) => k+'='+v).join('&') %>">
+                            <i class="bi bi-chevron-double-left"></i>
+                        </a>
+                    </li>
+                <% } %>
+                <% if (pagination.currentPage > 1) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<%= pagination.currentPage - 1 %>&<%= Object.entries(filters).filter(([k,v]) => v).map(([k,v]) => k+'='+v).join('&') %>">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                <% } %>
+                <% for (let i = pagination.startPage; i <= pagination.endPage; i++) { %>
+                    <li class="page-item <%= i === pagination.currentPage ? 'active' : '' %>">
+                        <a class="page-link" href="?page=<%= i %>&<%= Object.entries(filters).filter(([k,v]) => v).map(([k,v]) => k+'='+v).join('&') %>"><%= i %></a>
+                    </li>
+                <% } %>
+                <% if (pagination.currentPage < pagination.totalPages) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<%= pagination.currentPage + 1 %>&<%= Object.entries(filters).filter(([k,v]) => v).map(([k,v]) => k+'='+v).join('&') %>">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                <% } %>
+                <% if (pagination.hasNext) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=<%= pagination.endPage + 1 %>&<%= Object.entries(filters).filter(([k,v]) => v).map(([k,v]) => k+'='+v).join('&') %>">
+                            <i class="bi bi-chevron-double-right"></i>
+                        </a>
+                    </li>
+                <% } %>
+            </ul>
+        </nav>
+    <% } %>
+</div>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OPASNET 4A - 로그인</title>
+    <link href="/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/node_modules/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/public/css/style.css" rel="stylesheet">
+</head>
+<body class="login-body">
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h4><i class="bi bi-hdd-network"></i> OPASNET 4A</h4>
+                <p class="text-muted">장비관리 시스템</p>
+            </div>
+            <% if (error) { %>
+                <div class="alert alert-danger alert-sm" role="alert" style="font-size:12px;">
+                    <%= error %>
+                </div>
+            <% } %>
+            <form method="POST" action="/login">
+                <div class="mb-3">
+                    <label for="username" class="form-label">아이디</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                        <input type="text" class="form-control" id="username" name="username"
+                               placeholder="아이디를 입력하세요" autofocus required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">비밀번호</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                        <input type="password" class="form-control" id="password" name="password"
+                               placeholder="비밀번호를 입력하세요" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-accent w-100">
+                    로그인
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
